@@ -41,14 +41,17 @@ typedef struct instruction_s
 } instruction_t;
 
 size_t pall(stack_t **h);
-stack_t *push(stack_t **head, int n);
+stack_t *push(stack_t **head, char *num, unsigned int line_no);
 void pop(stack_t **head, unsigned int line_no);
 
 void pint(stack_t **h, unsigned int line_no);
 void swap(stack_t **h, unsigned int line_no);
 void add(stack_t **h, unsigned int line_no);
+void nop(stack_t **h, unsigned int line_no);
 
 void free_stack(stack_t *head);
+int comp_1(char *command, stack_t *head, unsigned int count);
+int comp_2(char *command, stack_t *head, unsigned int count);
 
 int _putchar(char c);
 

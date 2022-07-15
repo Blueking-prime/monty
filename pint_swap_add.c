@@ -12,7 +12,10 @@ void pint(stack_t **h, unsigned int line_no)
 	const stack_t *current;
 
 	if (*h == NULL)
-		fprintf(stderr, "L%d: can't swap, stack too short\n", line_no);
+	{
+		fprintf(stderr, "L%d: can't pint, stack empty\n", line_no);
+		exit(EXIT_FAILURE);
+	}
 
 	current = *h;
 	while (current->next != NULL)
@@ -35,15 +38,20 @@ void swap(stack_t **h, unsigned int line_no)
 
 	current = *h;
 
-	while(current->next != NULL)
+	if (*h == NULL)
+		exit(EXIT_FAILURE);
+
+	while (current->next != NULL)
 	{
 		current = current->next;
 		count++;
 	}
 
-	if (count != 2)
+	if (count < 2)
 	{
 		fprintf(stderr, "L%d: can't swap, stack too short\n", line_no);
+		free_stack(*h);
+		exit(EXIT_FAILURE);
 	}
 
 	n = current->n;
@@ -65,15 +73,20 @@ void add(stack_t **h, unsigned int line_no)
 
 	current = *h;
 
-	while(current->next != NULL)
+	if (*h == NULL)
+		exit(EXIT_FAILURE);
+
+	while (current->next != NULL)
 	{
 		current = current->next;
 		count++;
 	}
 
-	if (count != 2)
+	if (count < 2)
 	{
 		fprintf(stderr, "L%d: can't add, stack too short\n", line_no);
+		free_stack(*h);
+		exit(EXIT_FAILURE);
 	}
 
 	n = current->n + current->prev->n;

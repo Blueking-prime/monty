@@ -3,19 +3,36 @@
 /**
 * push - adds a new node at the end of a listint_t list
 * @head: pointer to pointer of first node of listint_t list
-* @n: integer to be included in new node
+* @num: integer to be included in new node
+* @line_no: integer to be included in new node
 * Return: address of the new element or NULL if it fails
 */
-stack_t *push(stack_t **head, int n)
+stack_t *push(stack_t **head, char *num, unsigned int line_no)
 {
 	stack_t *new;
 	stack_t *current;
+	int n, i;
 
 	current = *head;
 
 	new = malloc(sizeof(stack_t));
 	if (new == NULL)
-		return (NULL);
+	{
+		fprintf(stderr, "Error: malloc failed\n");
+		exit(EXIT_FAILURE);
+	}
+
+	for (i = 0; num[i] != '\0'; i++)
+	{
+		if (num[i] != '-' && (num[i] < 48 && num[i] > 57))
+		{
+			fprintf(stderr, "L%d: usage: push integer\n", line_no);
+			free(new);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	n = atoi(num);
 
 	new->prev = NULL;
 	new->n = n;
@@ -46,6 +63,10 @@ size_t pall(stack_t **h)
 
 	current = *h;
 	n = 0;
+
+	if (*h == NULL)
+		exit(EXIT_FAILURE);
+
 	while (current->next != NULL)
 		current = current->next;
 
@@ -62,6 +83,7 @@ size_t pall(stack_t **h)
 /**
 * pop - deletes a node at a point in a stack_t list
 * @head: pointer to pointer of first node of stack_t list
+* @line_no: integer to be included in new node
 * Return: address of the new element or NULL if it fails
 */
 
@@ -73,7 +95,7 @@ void pop(stack_t **head, unsigned int line_no)
 
 	if (*head == NULL)
 	{
-		fprintf(stderr, "L%d: can't pop an empty stack", line_no);
+		fprintf(stderr, "L%d: can't pop an empty stack\n", line_no);
 		exit(EXIT_FAILURE);
 	}
 

@@ -5,7 +5,7 @@
 *
 * @filename: name of file to be read
 *
-* @letters: numberof letters to be read from the file
+* @head: name of file to be read
 *
 * Return: number of letters read and printed
 */
@@ -14,7 +14,7 @@ int read_textfile(const char *filename, stack_t *head)
 {
 	FILE *monty_file;
 	char *buf = NULL;
-	char **command_set;
+	char **command_set = NULL;
 	size_t bufsize = 0;
 	unsigned int count = 1;
 
@@ -28,28 +28,32 @@ int read_textfile(const char *filename, stack_t *head)
 	while (getline(&buf, &bufsize, monty_file) != -1)
 	{
 		command_set = split_buf(buf);
-		printf("%s ", command_set[0]);
-		if (get_op_func(command_set[0]) == NULL)
-		{
-			fprintf(stderr, "L%d: unknown instruction %s", count, command_set[0]);
-			exit(EXIT_FAILURE);
-		}
+
 		if (strcmp(command_set[0], "push") == 0)
-			push(&head, atoi(command_set[1]));
-		else if (strcmp(command_set[0], "pall") == 0)
-			pall(&head);
+			push(&head, command_set[1], count);
 		else
-			get_op_func(command_set[0])(&head, count);
+		{
+			if (comp_1(command_set[0], head, count) == 0)
+				;
+			else if (comp_2(command_set[0], head, count) == 0)
+				;
+			else
+			{
+				count++;
+				continue;
+			}
+		}
 		count++;
 	}
-
 	fclose(monty_file);
+	free(command_set);
+	free_stack(head);
 	return (EXIT_SUCCESS);
 }
 
 /**
- * split_buf - function that tokenizes a string with spaces, tabs and new lines
- * as delimiters
+ * split_buf - function that tokenizes a string with spaces, tabs and
+ * new lines as delimiters
  * @buf: command line passed in by the user on standard input, string to be
  * parsed
  * Return: double pointer to an array (array of pointers to strings consisting
@@ -63,14 +67,16 @@ char **split_buf(char *buf)
 	char **array_buf = NULL;
 
 	count = token_count_buf(buf);
-	printf("%d", count);
 	if (count == 0)
 		return (NULL);
 
 	array_buf = malloc(sizeof(char *) * (count + 1));
 	if (array_buf == NULL)
-		exit(1);
-
+	{
+		fprintf(stderr, "Error: malloc failed\n");
+		free(array_buf);
+		exit(EXIT_FAILURE);
+	}
 	token = strtok(buf, " \n\t");
 	while (token != NULL)
 	{
@@ -78,14 +84,14 @@ char **split_buf(char *buf)
 		i++;
 		token = strtok(NULL, " \n\t");
 	}
-
+	i++;
 	array_buf[i] = NULL;
 	return (array_buf);
 }
 
 /**
- * token_count_buf - function that counts the number of strings typed in by the
- * user (in buf)
+ * token_count_buf - function that counts the number of strings typed in by
+ * the user (in buf)
  * @buf: command line passed in by the user on standard input, string to be
  * parsed
  * Return: token/string count
